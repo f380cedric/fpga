@@ -35,7 +35,7 @@ if d != 'a':
 
 l = short.unpack(bitfile.read(2))[0]
 d = bitfile.read(l)
-print "Design name:", d
+print("Design name:", d)
 
 KEYNAMES = {'b': "Partname", 'c': "Date", 'd': "Time"}
 
@@ -45,7 +45,7 @@ while 1:
 		raise Exception, "unexpected EOF"
 	elif k == 'e':
 		l = ulong.unpack(bitfile.read(4))[0]
-		print "found binary data:", l
+		print("found binary data:", l)
 		d = bitfile.read(l)
 		if args.flip:
 			d = flip32(d)
@@ -54,9 +54,9 @@ while 1:
 	elif k in KEYNAMES:
 		l = short.unpack(bitfile.read(2))[0]
 		d = bitfile.read(l)
-		print KEYNAMES[k], d
+		print(KEYNAMES[k], d)
 	else:
-		print "Unexpected key: ", k
+		print("Unexpected key: ", k)
 		l = short.unpack(bitfile.read(2))[0]
 		d = bitfile.read(l)
 

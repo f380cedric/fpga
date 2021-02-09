@@ -25,7 +25,7 @@ def print_timing_constraint_summary(timing_rpt_file):
     failed_timing = False
     try: open(timing_rpt_file)
     except IOError:
-        print "cannot open or find %s; no timing summary to print!"%timing_rpt_file
+        print("cannot open or find %s; no timing summary to print!"%timing_rpt_file)
         exit(-1)
     for line in open(timing_rpt_file).readlines():
         if 'Timing Summary Report' in line: keep = True
