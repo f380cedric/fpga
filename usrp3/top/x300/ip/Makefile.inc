@@ -17,6 +17,8 @@ include $(IP_DIR)/one_gig_eth_pcs_pma/Makefile.inc
 include $(IP_DIR)/pcie_clk_gen/Makefile.inc
 include $(IP_DIR)/radio_clk_gen/Makefile.inc
 include $(IP_DIR)/ten_gig_eth_pcs_pma/Makefile.inc
+include $(IP_DIR)/my_mult/Makefile.inc
+include $(IP_DIR)/my_adder/Makefile.inc
 
 IP_XCI_SRCS = \
 $(IP_AXI4_BRAM_SRCS) \
@@ -27,7 +29,9 @@ $(IP_BUS_CLK_GEN_SRCS) \
 $(IP_FIFO_4K_2CLK_SRCS) \
 $(IP_FIFO_SHORT_2CLK_SRCS) \
 $(IP_PCIE_CLK_GEN_SRCS) \
-$(IP_RADIO_CLK_GEN_SRCS)
+$(IP_RADIO_CLK_GEN_SRCS) \
+$(IP_MY_MULT_SRCS) \
+$(IP_MY_ADDER_SRCS)
 
 IP_ONE_GIGE_PHY_XCI_SRCS = \
 $(IP_ONE_GIG_ETH_PCS_PMA_SRCS) \
@@ -60,7 +64,9 @@ $(IP_FIFO_SHORT_2CLK_OUTS) \
 $(IP_ONE_GIG_ETH_PCS_PMA_OUTS) \
 $(IP_PCIE_CLK_GEN_OUTS) \
 $(IP_RADIO_CLK_GEN_OUTS) \
-$(IP_TEN_GIG_ETH_PCS_PMA_OUTS)
+$(IP_TEN_GIG_ETH_PCS_PMA_OUTS) \
+$(IP_MY_MULT_OUTS) \
+$(IP_MY_ADDER_OUTS)
 
 # Currently unused
 # $(IP_INPUT_SAMPLE_FIFO_OUTS) \

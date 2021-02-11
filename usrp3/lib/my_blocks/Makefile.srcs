@@ -1,0 +1,12 @@
+#
+# Copyright 2014 Ettus Research LLC
+#
+
+##################################################
+# My blocks library
+##################################################
+MY_BLOCKS_SRCS = $(abspath $(addprefix $(BASE_DIR)/../lib/my_blocks/, \
+my_corr_80211.v \
+my_corr_real.v \
+my_power_calc.v \
+))
