@@ -270,7 +270,7 @@ module radio #(
 
    // /////////////////////////////////////////////////////////////////////////////////
    //  TX Chain
-
+/*
    wire [175:0] txsample_tdata;
    wire 	txsample_tvalid, txsample_tready;
    wire [31:0] 	sample_tx;
@@ -323,7 +323,7 @@ module radio #(
 
    assign tx[31:16] = (run_tx)? tx_i_running : tx_idle[31:16];
    assign tx[15:0]  = (run_tx)? tx_q_running : tx_idle[15:0];
-
+*/
 
    // /////////////////////////////////////////////////////////////////////////////////
    //  RX Chain
