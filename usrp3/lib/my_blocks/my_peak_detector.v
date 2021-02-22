@@ -84,7 +84,7 @@ module my_peak_detector(
                     if (power_in > abs_threshold) begin
                         if (ram_corrSq_in[1] > threshold) begin
                             if ((ram_corrSq_in[1]>=ram_corrSq_in[0])&&(ram_corrSq_in[1]>=ram_corrSq_in[2])) begin // if local maxima
-                                if ((cpt_spls_since_last_peak == 320) && (cpt_spls_since_last_peak_2 == 640)) begin // If peak detected 64*5=320 samples earlier
+                                if ((cpt_spls_since_last_peak < 322) && (cpt_spls_since_last_peak > 318) && (cpt_spls_since_last_peak_2 < 642) && (cpt_spls_since_last_peak_2 > 638)) begin // If peak detected 64*5=320 samples earlier
                                     freeze_ram  = 1'b1;
                                     cpt_spls    = 0;
                                 end
