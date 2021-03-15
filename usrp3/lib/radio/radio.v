@@ -364,6 +364,14 @@ module radio #(
    // Digital Loopback TX -> RX (Pipeline immediately inside rx_frontend).
    wire [31:0] 	  rx_fe = loopback ? tx : rx;
 
+   wire [31:0] power;
+   wire [31:0] power_block;
+   wire [31:0] corr_sq;
+   wire [31:0] power_block_delayed;
+   wire found;
+   wire [31:0] corr;
+   wire [31:0] sample_in_delayed;
+   wire [31:0] sample_out_ddc;
    generate
       if (DELETE_DSP==0)
 	begin:	rx_dsp
@@ -379,8 +387,77 @@ module radio #(
 	     (.clk(radio_clk), .rst(radio_rst), .clr(1'b0),
 	      .set_stb(set_stb),.set_addr(set_addr),.set_data(set_data),
 	      .rx_fe_i(rx_corr_i),.rx_fe_q(rx_corr_q),
-	      .sample(sample_rx), .run(run_rx), .strobe(strobe_rx),
+	      .sample(sample_out_ddc), .run(run_rx), .strobe(strobe_rx),
 	      .debug() );
+
+	   my_correlator my_corr1(
+              .clk(radio_clk),
+              .rst(radio_rst),
+              .strobe_in(strobe_rx),
+              .sample_in(sample_out_ddc),
+              .corr_out(corr)
+           );
+
+           my_complex_to_magsq my_sample_power(
+              .clk(radio_clk),
+              .rst(radio_rst),
+              .strobe_in(strobe_rx),
+              .in(sample_out_ddc),
+              .out(power)
+           );
+
+           my_moving_sum my_block_power(
+              .clk(radio_clk),
+              .rst(radio_rst),
+              .strobe_in(strobe_rx),
+              .in(power[31:16]),
+              .out(power_block)
+           );
+
+           my_complex_to_magsq my_corr_power(
+              .clk(radio_clk),
+              .rst(radio_rst),
+              .strobe_in(strobe_rx),
+              .in(corr),
+              .out(corr_sq)
+           );
+
+           my_delay_power_block my_delay_power1(
+              .clk(radio_clk),
+              .rst(radio_rst),
+              .strobe_in(strobe_rx),
+              .power_in(power_block),
+              .power_out(power_block_delayed)
+           );
+
+           my_delay_sample_in my_delay_sample1(
+              .clk(radio_clk),
+              .rst(radio_rst),
+              .strobe_in(strobe_rx),
+              .sample_in(sample_out_ddc),
+              .sample_out(sample_in_delayed)
+           );
+
+           my_peak_detector my_peak_detector1(
+              .clk(radio_clk),
+              .rst(radio_rst),
+              .strobe_in(strobe_rx),
+              .corrSq(corr_sq),
+              .power(power_block_delayed),
+	      .set_stb(set_stb),
+	      .set_addr(set_addr),
+	      .set_data(set_data),
+	      .trigger(found)
+           );
+
+           my_window my_window1(
+              .clk(radio_clk),
+              .rst(radio_rst),
+              .strobe_in(strobe_rx),
+              .enable(found),
+              .in(sample_in_delayed),
+              .out(sample_rx)
+           );
 	end
    endgenerate
 
