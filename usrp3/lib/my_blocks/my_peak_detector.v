@@ -52,17 +52,17 @@ module my_peak_detector(
 
     reg [15:0] addr1, addr2;
     reg [31:0] ram_corrSq [1:0];
-    reg [15:0] cnt;
     reg enable;
 
     always @(posedge clk) begin
+        trigger <= 0;
         if (rst) begin
             addr1 <= 1;
             addr2 <= 1;
             ram_corrSq[0] <= 0;
             ram_corrSq[1] <= 0;
             trigger <= 0;
-            cnt <= 1 ;
+            enable <= 0;
         end else if (strobe_in) begin
             enable <= ((power > abs_threshold) & (corrSq > (power <<7)));
             ram_corrSq[0] <= ram_corrSq[1];
@@ -79,17 +79,6 @@ module my_peak_detector(
             end else begin
                 addr1 <= addr1 + 1;
                 addr2 <= addr2 + 1;
-            end
-        end
-    end
-
-    always @(posedge clk) begin
-        if (strobe_in & trigger) begin
-            if (cnt == 320) begin
-                trigger <= 0;
-                cnt <= 1;
-            end else begin
-                cnt <= cnt + 1;
             end
         end
     end
