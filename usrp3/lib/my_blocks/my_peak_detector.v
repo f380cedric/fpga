@@ -70,8 +70,8 @@ module my_peak_detector(
             if (enable & ((ram_corrSq[1] > ram_corrSq[0]) && (ram_corrSq[1] > corrSq))) begin
                 if ((addr2 > 318) && (addr2 < 322) && (addr1 > 638) && (addr1 < 642)) begin
                     trigger <= 1;
-                    addr1 <= 0;
-                    addr2 <= 0;
+                    addr1 <= 1;
+                    addr2 <= 1;
                 end else begin
                     addr1 <= addr2 + 1;
                     addr2 <= 1;

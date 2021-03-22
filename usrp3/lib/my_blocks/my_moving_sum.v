@@ -32,6 +32,7 @@ module my_moving_sum(
         if (rst) begin
             cnt <= 1;
             index <= 0;
+            out <= 0;
             for(i=0; i<5; i=i+1) begin
                 sum_reg[i] <= 0;
             end
