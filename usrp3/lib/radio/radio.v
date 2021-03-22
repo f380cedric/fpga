@@ -450,7 +450,9 @@ module radio #(
 	      .trigger(found)
            );
 
-           my_window my_window1(
+           my_window #(
+              .SIZE(1600)
+           ) my_window1(
               .clk(radio_clk),
               .rst(radio_rst),
               .strobe_in(strobe_rx),

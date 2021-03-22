@@ -28,24 +28,31 @@ module my_delay_sample_in(
     output [31:0] sample_out
     );
 
-    reg [8:0] cnt;
-    wire reset = rst | (cnt != 349);
+    wire reset;
+    my_reset_for_srl #(
+       .SIZE(1645)
+    ) reset_srl_1645(
+       .clk(clk),
+       .rst(rst),
+       .strobe_in(strobe_in),
+       .reset_srl(reset)
+    );
 
-    my_shift_349 delay_sample (
+    wire [31:0] tmp;
+    my_shift_1088 delay_sample0 (
         .D(sample_in),        // input wire [30 : 0] D
         .CLK(clk),    // input wire CLK
         .CE(strobe_in),      // input wire CE
-        .SCLR(rst),  // input wire SCLR
-        .Q(sample_out)        // output wire [30 : 0] Q
+        .SCLR(),  // input wire SCLR
+        .Q(tmp)        // output wire [30 : 0] Q
     );
 
-    always @(posedge clk) begin
-        if (rst) begin
-            cnt <= 1;
-        end else if (strobe_in) begin
-            if (reset) begin
-                cnt <= cnt + 1;
-            end
-        end
-    end
+    my_shift_537 delay_sample1 (
+            .D(tmp),        // input wire [30 : 0] D
+            .CLK(clk),    // input wire CLK
+            .CE(strobe_in),      // input wire CE
+            .SCLR(reset),  // input wire SCLR
+            .Q(sample_out)        // output wire [30 : 0] Q
+        );
+
 endmodule

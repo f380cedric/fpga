@@ -28,24 +28,22 @@ module my_delay_power_block(
     output [31:0] power_out
     );
 
-    reg [8:0] cnt;
-    wire reset = rst | (cnt != 340);
+    wire reset;
+    my_reset_for_srl #(
+        .SIZE(25)
+    ) reset_srl_25(
+        .clk(clk),
+        .rst(rst),
+        .strobe_in(strobe_in),
+        .reset_srl(reset)
+    );
 
-    my_shift_340 delay_power (
+    my_shift_25 delay_power (
         .D(power_in),        // input wire [30 : 0] D
         .CLK(clk),    // input wire CLK
         .CE(strobe_in),      // input wire CE
-        .SCLR(rst),  // input wire SCLR
+        .SCLR(reset),  // input wire SCLR
         .Q(power_out)        // output wire [30 : 0] Q
     );
 
-    always @(posedge clk) begin
-        if (rst) begin
-            cnt <= 1;
-        end else if (strobe_in) begin
-            if (reset) begin
-                cnt <= cnt + 1;
-            end
-        end
-    end
 endmodule

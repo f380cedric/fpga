@@ -3,9 +3,9 @@
 // Company:
 // Engineer:
 //
-// Create Date: 15.03.2021 00:42:35
+// Create Date: 18.03.2021 19:00:24
 // Design Name:
-// Module Name: window
+// Module Name: reset_for_srl
 // Project Name:
 // Target Devices:
 // Tool Versions:
@@ -20,27 +20,22 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module my_window #(
+module my_reset_for_srl#(
     parameter SIZE = 320
     )(
     input clk,
     input rst,
     input strobe_in,
-    input enable,
-    input [31:0] in,
-    output [31:0] out
+    output reset_srl
     );
 
-    reg [$clog2(SIZE+1)-1:0] cnt;
-    wire do_op = (cnt != (SIZE));
-    assign out = (do_op ? in : 0);
+    reg [$clog2(SIZE)-1:0] cnt;
+    assign reset_srl = rst | (cnt != (SIZE-1));
 
     always @(posedge clk) begin
         if (rst) begin
-            cnt <= SIZE;
-        end else if (enable) begin
             cnt <= 0;
-        end else if (strobe_in & do_op) begin
+        end else if (strobe_in & reset_srl) begin
             cnt <= cnt + 1;
         end
     end

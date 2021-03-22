@@ -25,26 +25,41 @@ module my_complex_to_magsq(
     input rst,
     input [31:0] in,
     input strobe_in,
-    output reg [31:0] out
+    output [31:0] out
     );
 
-    reg signed [15:0] in_i, in_q;
+    wire signed [15:0] in_i, in_q;
+    assign {in_i, in_q} = in;
+    reg signed [15:0] in_q_reg;
+    wire [47:0] in_sq;
 
+    my_mult_ii my_mult_ii1(
+      .CLK(clk),            // input wire CLK
+      .CE(1'b1),              // input wire CE
+      .SCLR(rst),          // input wire SCLR
+      .A(in_i),                // input wire [15 : 0] A
+      .B(in_i),                // input wire [15 : 0] B
+      .C(16'b0),
+      .PCOUT(in_sq)        // output wire [47 : 0] PCOUT
+    );
 
-    // Inputs and outputs multipliers
-    wire [31:0] inSq_i, inSq_q;
-    my_mult mult_in_i(.CLK(clk),.SCLR(rst),.A(in_i),.B(in_i),.P(inSq_i));
-    my_mult mult_in_q(.CLK(clk),.SCLR(rst),.A(in_q),.B(in_q),.P(inSq_q));
+    my_mult_ii_qq my_mult_ii_qq1 (
+      .CLK(clk),            // input wire CLK
+      .CE(1'b1),              // input wire CE
+      .SCLR(rst),          // input wire SCLR
+      .A(in_q_reg),                // input wire [15 : 0] A
+      .B(in_q_reg),                // input wire [15 : 0] B
+      .PCIN(in_sq),          // input wire [47 : 0] PCIN
+      .P(out)
+    );
 
     always @(posedge clk) begin
-        if(rst) begin
-            out <= 0;
-            in_i <= 0;
-            in_q <= 0;
-        end else if (strobe_in) begin
-            in_i <= in[31:16];
-            in_q <= in[15:0];
-            out <= inSq_i + inSq_q;
+        if (rst) begin
+            in_q_reg <= 0;
+        end else begin
+            in_q_reg <= in_q;
+
         end
     end
+
 endmodule

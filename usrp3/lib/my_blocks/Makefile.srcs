@@ -13,4 +13,5 @@ my_delay_sample_in.v \
 my_moving_sum.v \
 my_peak_detector.v \
 my_window.v \
+my_reset_for_srl.v \
 ))
