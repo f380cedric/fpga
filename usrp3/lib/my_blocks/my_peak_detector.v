@@ -29,47 +29,51 @@ module my_peak_detector(
     output reg trigger
     );
 
-    localparam UR_THRESHOLD = 8'd252;
-    localparam DEFAULT_THRESHOLD = 32'd1000;
+    localparam LOWER_BOUND = 9'd318;
+    localparam UPPER_BOUND = 9'd322;
+    localparam HALF_BAND = 161;
 
-    reg [15:0] addr1, addr2;
+    reg [8:0] last_peak;
+    reg [7:0] current_peak;
     reg [31:0] ram_corrSq [1:0];
     reg [31:0] local_metric;
     reg enable;
+    wire peak_stb = enable & ((ram_corrSq[1] > ram_corrSq[0]) && (ram_corrSq[1] > corrSq));
 
     always @(posedge clk) begin
         trigger <= 0;
         if (rst) begin
-            addr1 <= 1;
-            addr2 <= 1;
+            last_peak <= 0;
+            current_peak <= 0;
             ram_corrSq[0] <= 0;
             ram_corrSq[1] <= 0;
             local_metric <= 0;
             trigger <= 0;
             enable <= 0;
         end else if (strobe_in) begin
-            enable <= ((power > DEFAULT_THRESHOLD) & (corrSq > (power <<6)));
+            enable <= (corrSq > ((power+8) <<8));
             ram_corrSq[0] <= ram_corrSq[1];
             ram_corrSq[1] <= corrSq;
-            if (enable & ((ram_corrSq[1] > ram_corrSq[0]) && (ram_corrSq[1] > corrSq))) begin
-                if ((addr2 > 318) && (addr2 < 322) && (addr1 > 638) && (addr1 < 642)) begin
-                    trigger <= 1;
-                    addr1 <= 1;
-                    addr2 <= 1;
-                // Avoid small glithes in the vicinity of the peak
-                end else if (addr2 >= 16) begin
-                    addr1 <= addr2 + 1;
-                    addr2 <= 1;
-                    local_metric <= ram_corrSq[1];
-                // Accept in vicinity iif peak higher
-                end else if  (ram_corrSq[1] > local_metric) begin
-                    addr1 <= addr2 + 1;
-                    addr2 <= 1;
-                    local_metric <= ram_corrSq[1];
-                end
-            end else begin
-                addr1 <= addr1 + 1;
-                addr2 <= addr2 + 1;
+            if (last_peak > 0) begin
+                last_peak <= last_peak + 1;
+            end
+            if (current_peak > 0) begin
+                current_peak <= current_peak + 1;
+            end
+            if (peak_stb & (last_peak > LOWER_BOUND) & (last_peak < UPPER_BOUND)) begin
+                trigger <= 1;
+                last_peak <= 0;
+                current_peak <= 0;
+                local_metric <= 0;
+            end else if (peak_stb && ram_corrSq[1] > local_metric) begin
+                current_peak <= 1;
+                local_metric <= ram_corrSq[1];
+            end else if (current_peak >= HALF_BAND) begin
+                current_peak <= 0;
+                local_metric <= 0;
+                last_peak <= current_peak + 1;
+            end else if (last_peak >= UPPER_BOUND) begin
+                last_peak <= 0;
             end
         end
     end
