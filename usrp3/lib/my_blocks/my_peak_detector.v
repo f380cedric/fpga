@@ -52,6 +52,7 @@ module my_peak_detector(
 
     reg [15:0] addr1, addr2;
     reg [31:0] ram_corrSq [1:0];
+    reg [31:0] local_metric;
     reg enable;
 
     always @(posedge clk) begin
@@ -61,10 +62,11 @@ module my_peak_detector(
             addr2 <= 1;
             ram_corrSq[0] <= 0;
             ram_corrSq[1] <= 0;
+            local_metric <= 0;
             trigger <= 0;
             enable <= 0;
         end else if (strobe_in) begin
-            enable <= ((power > abs_threshold) & (corrSq > (power <<7)));
+            enable <= ((power > abs_threshold) & (corrSq > (power <<6)));
             ram_corrSq[0] <= ram_corrSq[1];
             ram_corrSq[1] <= corrSq;
             if (enable & ((ram_corrSq[1] > ram_corrSq[0]) && (ram_corrSq[1] > corrSq))) begin
@@ -72,9 +74,16 @@ module my_peak_detector(
                     trigger <= 1;
                     addr1 <= 1;
                     addr2 <= 1;
-                end else begin
+                // Avoid small glithes in the vicinity of the peak
+                end else if (addr2 >= 16) begin
                     addr1 <= addr2 + 1;
                     addr2 <= 1;
+                    local_metric <= ram_corrSq[1];
+                // Accept in vicinity iif peak higher
+                end else if  (ram_corrSq[1] > local_metric) begin
+                    addr1 <= addr2 + 1;
+                    addr2 <= 1;
+                    local_metric <= ram_corrSq[1];
                 end
             end else begin
                 addr1 <= addr1 + 1;
