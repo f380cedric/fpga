@@ -444,9 +444,6 @@ module radio #(
               .strobe_in(strobe_rx),
               .corrSq(corr_sq),
               .power(power_block_delayed),
-	      .set_stb(set_stb),
-	      .set_addr(set_addr),
-	      .set_data(set_data),
 	      .trigger(found)
            );
 

@@ -26,29 +26,11 @@ module my_peak_detector(
     input strobe_in,
     input [31:0] power,
     input [31:0] corrSq,
-    input set_stb, input [7:0] set_addr, input [31:0] set_data,
     output reg trigger
     );
 
     localparam UR_THRESHOLD = 8'd252;
     localparam DEFAULT_THRESHOLD = 32'd1000;
-
-    wire [31:0] abs_threshold;
-    wire [31:0] threshold;
-
-    setting_reg #(
-        .my_addr(UR_THRESHOLD),
-        .width(32),
-        .at_reset(DEFAULT_THRESHOLD)
-    ) set_threshold(
-        .clk(clk),
-        .rst(rst),
-        .strobe(set_stb),
-        .addr(set_addr),
-        .in(set_data),
-        .out(abs_threshold),
-        .changed()
-    );
 
     reg [15:0] addr1, addr2;
     reg [31:0] ram_corrSq [1:0];
@@ -66,7 +48,7 @@ module my_peak_detector(
             trigger <= 0;
             enable <= 0;
         end else if (strobe_in) begin
-            enable <= ((power > abs_threshold) & (corrSq > (power <<6)));
+            enable <= ((power > DEFAULT_THRESHOLD) & (corrSq > (power <<6)));
             ram_corrSq[0] <= ram_corrSq[1];
             ram_corrSq[1] <= corrSq;
             if (enable & ((ram_corrSq[1] > ram_corrSq[0]) && (ram_corrSq[1] > corrSq))) begin
